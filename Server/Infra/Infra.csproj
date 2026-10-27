@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Service\Service.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="linq2db.AspNet" Version="5.4.1.9" />
   </ItemGroup>
 
