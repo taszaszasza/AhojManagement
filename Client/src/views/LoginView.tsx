@@ -43,7 +43,7 @@ export function LoginView(props: LoginViewProps) {
     };
 
     return (
-        <div>
+        <div className="auth-container">
             <h2>Sign In</h2>
     <form onSubmit={handleSubmit}>
     <div>
@@ -58,7 +58,7 @@ export function LoginView(props: LoginViewProps) {
     />
     </div>
 
-    <div>
+    <div className="form-group">
     <label htmlFor="password">Password: </label>
     <input
     id="password"
@@ -70,7 +70,7 @@ export function LoginView(props: LoginViewProps) {
         />
         </div>
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="btn-primary btn-full" disabled={loading}>
         {loading ? "Signing in..." : "Log In"}
         </button>
         </form>

@@ -106,8 +106,8 @@ export function UserManagementView(props: UserManagementViewProps) {
 
 
     return (
-        <div>
-            <div>
+        <div className="container">
+            <div className="header-row">
                 <h2>User Management</h2>
                 <div>
           <span>
@@ -122,9 +122,10 @@ export function UserManagementView(props: UserManagementViewProps) {
             <hr />
 
             {canCreate && (
-                <div>
+                <div className="actions-bar">
                     <button
                         type="button"
+                        className="btn-primary"
                         onClick={() => {
                             setEditingUser(null);
                             setIsModalOpen(true);
@@ -138,7 +139,7 @@ export function UserManagementView(props: UserManagementViewProps) {
             {loading ? (
                 <p>Loading users...</p>
             ) : (
-                <table border={1} cellPadding={6} style={{ borderCollapse: "collapse", width: "100%" }}>
+                <table className="table">
                     <thead>
                     <tr>
                         <th>First Name</th>
@@ -165,7 +166,7 @@ export function UserManagementView(props: UserManagementViewProps) {
                                 {(props.currentUser.role === "Admin" || props.currentUser.role === "Superuser") && (
                                     <td>
                                         {canModifyRow(u) && (
-                                            <>
+                                            < div className="button-row">
                                                 <button
                                                     type="button"
                                                     onClick={() => {
@@ -178,12 +179,13 @@ export function UserManagementView(props: UserManagementViewProps) {
                                                 {u.userId !== props.currentUser.userId && (
                                                     <button
                                                         type="button"
+                                                        className="btn-danger"
                                                         onClick={() => deleteUser(u.userId!)}
                                                     >
                                                         Delete
                                                     </button>
                                                 )}
-                                            </>
+                                            </div>
                                         )}
                                     </td>
                                 )}

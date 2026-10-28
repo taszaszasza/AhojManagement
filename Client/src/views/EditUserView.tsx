@@ -40,24 +40,12 @@ export function EditUserView({
     };
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100vw",
-                height: "100vh",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            <div style={{ background: "white", padding: 20, border: "2px solid black", minWidth: 320 }}>
+        <div className="modal-backdrop">
+            <div className="modal-content">
                 <h3>{isEditing ? `Edit User: ${initialUser?.login}` : "Create New User"}</h3>
 
                 <form onSubmit={handleSubmit}>
-                    <div>
+                    <div className="form-group">
                         <label>First Name: </label>
                         <input
                             type="text"
@@ -67,7 +55,7 @@ export function EditUserView({
                         />
                     </div>
 
-                    <div>
+                    <div className="form-group">
                         <label>Last Name: </label>
                         <input
                             type="text"
@@ -79,7 +67,7 @@ export function EditUserView({
                     
 
                     {!isEditing && (
-                        <div>
+                        <div className="form-group">
                             <label>Password: </label>
                             <input
                                 type="password"
@@ -90,7 +78,7 @@ export function EditUserView({
                         </div>
                     )}
 
-                    <div>
+                    <div className="form-group">
                         <label>Role: </label>
                         <select
                             value={role}
@@ -108,6 +96,8 @@ export function EditUserView({
                     </div>
 
                     <hr />
+                    
+                    <div className="modal-actions">
 
                     <button type="submit">
                         {isEditing ? "Save Changes" : "Create"}
@@ -115,6 +105,7 @@ export function EditUserView({
                     <button type="button" onClick={onClose} style={{ marginLeft: 8 }}>
                         Cancel
                     </button>
+                    </div>
                 </form>
             </div>
         </div>
