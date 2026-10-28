@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using LinqToDB.Mapping;
 namespace Infra;
 
@@ -21,6 +20,6 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
 
     [Column(CanBeNull = false)] 
-    public string Role { get; set; } = Service.Enums.Role.User.ToString();
+    public string Role { get; set; } = "User";
 
 }

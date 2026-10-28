@@ -58,7 +58,7 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
 
     }
 
-    public Dtos.UserResponseDto CreateUser(Dtos.CreateUserDto userDto)
+    public Dtos.UserResponseDto CreateUser(Dtos.CreateUserDto userDto, string userRole)
     {
         if (string.IsNullOrWhiteSpace(userDto.FirstName) || string.IsNullOrWhiteSpace(userDto.LastName) ||
             string.IsNullOrWhiteSpace(userDto.Password))
@@ -71,6 +71,9 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
         } while (db.Users.Any(u => u.Login == login));
 
         string passwordHash = passwordHasher.HashAndSaltPassword(userDto.Password);
+        
+        // if a superuser is trying to create anything else than user, that's a big no-no
+        if (userRole == "Superuser" && userDto.Role != "User") throw new UnauthorizedAccessException("Superusers can only create regular Users.");
 
         var user = new User()
         {
@@ -86,9 +89,14 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
         return new Dtos.UserResponseDto(user.UserId, user.FirstName, user.LastName, user.Login, user.Role);
     }
 
-    public List<Dtos.UserResponseDto> GetUsers()
+    public List<Dtos.UserResponseDto> GetUsers(string callerRole)
     {
-        return db.Users.Select( u => new Dtos.UserResponseDto(
+        var query = db.Users.AsQueryable();
+        
+        //if the role is user or suepruser (not admin), I'm limiting the search to only users
+        if(callerRole != "Admin") query = query.Where(u => u.Role == "User");
+        
+        return query.Select( u => new Dtos.UserResponseDto(
             u.UserId,
             u.FirstName,
             u.LastName,
@@ -96,7 +104,7 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
             u.Role)).ToList();
     }
 
-    public Dtos.UserResponseDto GetUserById(string id)
+    public Dtos.UserResponseDto GetUserById(string id, string currentRole)
     {
         if (!db.Users.Any(user => user.UserId == id)) throw new KeyNotFoundException("No user with this id");
         
@@ -107,20 +115,28 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
             u.Login,
             u.Role)).FirstOrDefault();
         
+        if (currentRole != "Admin" && user.Role != "User") throw new UnauthorizedAccessException("You can only access USERS");
+        
         return user;
     }
 
-    public Dtos.UserResponseDto UpdateUser(string userId, Dtos.UpdateUserDto userDto)
+    public Dtos.UserResponseDto UpdateUser(string userId, Dtos.UpdateUserDto userDto, string currentRole)
     {
         if (!db.Users.Any(user => user.UserId == userId)) throw new KeyNotFoundException("No user with this id");
+        
+       
 
         if (string.IsNullOrWhiteSpace(userDto.FirstName) || string.IsNullOrWhiteSpace(userDto.LastName))
             throw new ValidationException("blank space...");
         
         var user = db.Users.FirstOrDefault(u => u.UserId == userId);
+        
+        if (currentRole == "Superuser" &&  user.Role != "User") throw new UnauthorizedAccessException("You can only modify USERS");
 
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
+        
+        if (currentRole == "Superuser" && userDto.Role!="User") throw new UnauthorizedAccessException("You are not autorized to change roles");
         user.Role =  userDto.Role;
         
         db.Update(user);
@@ -129,12 +145,13 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
 
     }
 
-    public void DeleteUser(string userId)
+    public void DeleteUser(string userId, string userRole, string currentId)
     {
-        if (!db.Users.Any(user => user.UserId == userId)) throw new KeyNotFoundException("No user with this id");
-       // if (currentUser.UserId ==  userId) throw new UnauthorizedAccessException("You cant delete yourself");
-       
        var user = db.Users.FirstOrDefault(u => u.UserId == userId);
+       
+       if (user == null) throw new KeyNotFoundException("No user with this id");
+       if(user.UserId == currentId) throw new UnauthorizedAccessException("You cannot delete yourself");
+       if(userRole == "Superuser" && user.Role != "User") throw new UnauthorizedAccessException("You can only modify USERs");
        db.Delete(user);
 
     }
