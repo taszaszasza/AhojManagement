@@ -1,22 +1,41 @@
-import { APITester } from "./APITester";
 import "./index.css";
-
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
+import {LoginView} from "./views/LoginView.tsx";
+import {UserManagementView} from "./views/UserManagementView.tsx";
+import {useState} from "react";
+import {clearAuthToken, getAuthToken} from "@/apiClient.ts";
+import type {UserResponseDto} from "@/api.ts";
+import {Toaster} from "react-hot-toast";
 
 export function App() {
-  return (
-    <div className="app">
-      <div className="logo-container">
-        <img src={logo} alt="Bun Logo" className="logo bun-logo" />
-        <img src={reactLogo} alt="React Logo" className="logo react-logo" />
-      </div>
 
-      <h1>Bun + React</h1>
-      <p>
-        Edit <code>src/App.tsx</code> and save to test HMR
-      </p>
-      <APITester />
+    const [token, setToken] = useState<string | null>(() => getAuthToken());
+    const [currentUser, setCurrentUser] = useState<UserResponseDto | null>(() => {
+        const raw = sessionStorage.getItem("user");
+        return raw ? JSON.parse(raw) : null;
+    });
+
+    const handleLoginSuccess = () => {
+        setToken(getAuthToken());
+        const raw = sessionStorage.getItem("user");
+        setCurrentUser(raw ? JSON.parse(raw) : null);
+    };
+
+    const handleLogout = () => {
+        clearAuthToken();
+        setToken(null);
+        setCurrentUser(null);
+    };
+    
+    
+  return (
+      
+      <div className="App">
+          <Toaster position="top-right" />
+          {!token || !currentUser ? (
+              <LoginView onLoginSuccess={handleLoginSuccess} />
+          ) : (
+              <UserManagementView currentUser={currentUser} onLogout={handleLogout} />
+          )}
     </div>
   );
 }

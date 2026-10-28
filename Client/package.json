@@ -5,16 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
+    "gen:api": "bunx swagger-typescript-api generate --path \"http://localhost:5124/swagger/v1/swagger.json\" --output ./src --name api.ts",
     "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "start": "NODE_ENV=production bun src/index.ts"
   },
   "dependencies": {
-    "react": "^19",
-    "react-dom": "^19"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-hot-toast": "^2.6.1"
   },
   "devDependencies": {
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/bun": "latest"
+  },
+  "module": "src/index.ts",
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }
