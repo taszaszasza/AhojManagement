@@ -124,12 +124,41 @@ Allowing only the ports required by an application limits unnecessary exposure. 
 | Mobile devices and fixed systems need different addressing methods. | Use DHCP for end-user devices, static addresses for servers and infrastructure, and static addresses or reservations for fixed/shared devices. |
 | The assignment does not specify default gateways. | Propose `10.5.70.1` and `10.5.71.1`; confirm them against the network design before implementation. |
 
-## 8. Conclusion
+
+## 8. Summary of CDS.Infrastructure part
 
 The proposal separates clients (`10.5.70.0/24`) from servers (`10.5.71.0/24`), with 254 usable host addresses per subnet. The two-VLAN design meets the stated requirements while keeping the network simple; additional segmentation could be considered as the company grows.
 
+# Deployment
 
+For the deployment phase, we used some of the following Ubuntu terminal commands:
+- sudo snap install docker
+- docker-compose
+- sudo docker ps
+- git clone https://github.com/taszaszasza/AhojManagement.git
+- cd AhojManagement
+- sudo docker compose version
+- sudo docker compose up -d build
+- sudo docker compose ps
+- ip -4 addr show
 
+<img width="3810" height="2001" alt="Screenshot 2026-10-29 152634" src="https://github.com/user-attachments/assets/c3f622f7-364f-4a2c-8bfa-a678efa5fa5b" />
+
+At this point, we switched to the client VM 570 and we tried to reach the url http://10.5.71.112:8080, which successfully led us to the login page of the application:
+
+<img width="1602" height="1082" alt="Screenshot 2026-10-29 152804" src="https://github.com/user-attachments/assets/f7218c7c-7752-415f-99b7-93b437292ef8" />
+
+<img width="1602" height="1082" alt="Screenshot 2026-10-29 152725" src="https://github.com/user-attachments/assets/c0564274-e891-4c13-9a73-2d9c9fcebaab" />
+
+# Reflections
+
+## Final Reflection
+
+This project helped us understand how application security and infrastructure work together. In AhojManagement, Argon2 password hashing, JWT authentication and backend role checks protect user accounts and application functionality. The server and network configuration determine how the application can be accessed, so both layers are important. However, in this project we ended up developing security at the backend/frontend level, rather than being involved in the implementation and deployment of a real-world infrastructure security deployment.
+
+One challenge was that Ubuntu commands and network settings can differ between versions. We also had to understand Docker port mapping and how the client reaches the application. We deployed AhojManagement on an Ubuntu Server VM on VLAN 571 and accessed it from an Ubuntu Desktop VM on VLAN 570 through port 8080. We also learned that the proposed network for Kvist & Bjælke ApS is a separate theoretical task: the proposed design of the company in the CDS Infrastructure part does not represent the pre-requisite for the deployment of our security application.
+
+For a real company, we would add HTTPS, handle secrets carefully, keep the server and containers updated, and introduce monitoring and backups. We would also consider separate VLANs for guest devices, cameras and other equipment to improve isolation. Before going into production, we would test the complete setup and its recovery process.
 
 
 ## Reference
