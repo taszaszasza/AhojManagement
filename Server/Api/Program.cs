@@ -79,9 +79,6 @@ var app = builder.Build();
 // db initialization, no seeder cause it's only one Admin initially
     using (var scope = app.Services.CreateScope())
     {
-        try
-        {
-            // Ensure directory exists so SQLite doesn't fail
             Directory.CreateDirectory("../Infra");
 
             var db = scope.ServiceProvider.GetRequiredService<MyDatabaseConnection>();
@@ -97,19 +94,32 @@ var app = builder.Build();
                     FirstName = "Admin",
                     LastName = "System",
                     Login = "admin",
-                    PasswordHash = hasher.HashAndSaltPassword("Admin123!"),
+                    PasswordHash = hasher.HashAndSaltPassword("123"),
                     Role = "Admin"
                 };
+                var user = new User
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    FirstName = "Example",
+                    LastName = "User",
+                    Login = "user",
+                    PasswordHash = hasher.HashAndSaltPassword("123"),
+                    Role = "User"
+                };
+                var superuser = new User
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    FirstName = "Example",
+                    LastName = "Superuser",
+                    Login = "superuser",
+                    PasswordHash = hasher.HashAndSaltPassword("123"),
+                    Role = "Superuser"
+                };
                 db.Insert(admin);
+                db.Insert(user);
+                db.Insert(superuser);
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("================ STARTUP ERROR ================");
-            Console.WriteLine(ex.InnerException?.ToString() ?? ex.ToString());
-            Console.WriteLine("===============================================");
-            throw;
-        }
+        
     
 }
 
