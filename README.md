@@ -152,8 +152,6 @@ At this point, we switched to the client VM 570 and we tried to reach the url ht
 
 # Reflections
 
-## Final Reflection
-
 This project helped us understand how application security and infrastructure work together. In AhojManagement, Argon2 password hashing, JWT authentication and backend role checks protect user accounts and application functionality. The server and network configuration determine how the application can be accessed, so both layers are important. However, in this project we ended up developing security at the backend/frontend level, rather than being involved in the implementation and deployment of a real-world infrastructure security deployment.
 
 One challenge was that Ubuntu commands and network settings can differ between versions. We also had to understand Docker port mapping and how the client reaches the application. We deployed AhojManagement on an Ubuntu Server VM on VLAN 571 and accessed it from an Ubuntu Desktop VM on VLAN 570 through port 8080. We also learned that the proposed network for Kvist & Bjælke ApS is a separate theoretical task: the proposed design of the company in the CDS Infrastructure part does not represent the pre-requisite for the deployment of our security application.
