@@ -1,7 +1,7 @@
 import {Api} from "./api.ts";
 
 export const api = new Api<string>({
-    baseUrl: "http://localhost:5124",
+    baseUrl: `${window.location.protocol}//${window.location.hostname}:8001`,
     securityWorker: (token) => {
         if (!token) {
             return {};
