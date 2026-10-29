@@ -105,6 +105,33 @@ Allowing only the ports required by an application limits unnecessary exposure. 
 
 The proposal separates clients (`10.5.70.0/24`) from servers (`10.5.71.0/24`), with 254 usable host addresses per subnet. The two-VLAN design meets the stated requirements while keeping the network simple; additional segmentation could be considered as the company grows.
 
+# Codebase
+## 1. Password Hashing
+
+To assure security of the application's users', password hashing was introduced. Passwords are never stored or accessible in plaintext, but hashed using unique salt instead (Argon2) - this prevents brute-force attacks. On top of that, constant-time comparison is used during verification to prevent timing attacks. Comparing by == checks every character one by one and returns false once it hits a mismatch. Constant time comparison returns true/false once the whole string is checked, prevents potential attackers to draw conclusions based on the response time.
+
+<img width="726" height="864" alt="image" src="https://github.com/user-attachments/assets/795963a5-748a-40ce-99fe-c772cd610f30" />
+
+## 2. User Login & Access Tokens (JWT)
+To increase security of the application, JSON Web Tokens were introduced. Instead of remembering current user's id, which is prone to attacks, a token is created on log-in. It is stored in a database session and includes identification of the logged-in user, their role (used in role based authorisation described below), and an expiry point. The backend contains a key that encrypts the token and makes in un-readable. Even it the token happens to be intercepted and tampered with, it will be rejected by the server. The Token is passed on every time identification of the current user is needed.
+
+
+<img width="854" height="578" alt="image" src="https://github.com/user-attachments/assets/db25e8fa-3df7-45f3-bcb3-20e1342e8edf" />
+<img width="701" height="490" alt="image" src="https://github.com/user-attachments/assets/a016d149-9d65-40ec-b5a8-dcf14858831d" />
+
+<img width="797" height="202" alt="image" src="https://github.com/user-attachments/assets/b6d4ede6-8d74-4845-a3e8-cd8173dc0957" />
+
+## 3. Role-based Access Control
+As an additional layer of security, regular users cannot hit administrative endpoints even if they find the API link. It was achieved by attaching [Authorize(Roles = "Admin")]. Instead of checking roles on the frontend (which a user could bypass in their browser's dev tools), the backend verifies the role inside the cryptographically signed token before running the request. [AllowAnonymous] - lets all users use the endpoint
+[Authorize] - only logged in users are allow to use the endpoint
+[Authorized(Roles = "XYZ")] - only users with role XYZ are allowed to use the endpoint.
+
+<img width="720" height="579" alt="image" src="https://github.com/user-attachments/assets/5562bc97-b116-4bf7-ad8f-dc76068f6daa" />
+
+
+
 ## Reference
 
 Kvist & Bjælke ApS, *CDS.infrastructure assignment brief* supplied for this project.
+Auth0. (n.d.). Introduction to JSON Web Tokens. jwt.io. Retrieved October 29, 2026, from https://jwt.io/introduction#what-is-json-web-token
+Google. (2026). Gemini (Feb 2026 version) [Large language model]. https://gemini.google.com - used for generating CSS styling, brain storming ideas, and explaining concepts.
