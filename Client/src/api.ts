@@ -41,6 +41,10 @@ export interface UpdateUserDto {
   role?: string | null;
 }
 
+export interface ChangePasswordRequestDto {
+  newPassword?: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -420,6 +424,32 @@ export class Api<
     ) =>
       this.request<UserResponseDto, any>({
         path: `/Users/UpdateUser`,
+        method: "PUT",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name UsersChangePassword
+     * @request PUT:/Users/ChangePassword
+     * @secure
+     */
+    usersChangePassword: (
+      data: ChangePasswordRequestDto,
+      query?: {
+        userId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<UserResponseDto, any>({
+        path: `/Users/ChangePassword`,
         method: "PUT",
         query: query,
         body: data,

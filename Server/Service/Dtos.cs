@@ -35,4 +35,8 @@ public class Dtos
         string Login,
         string Role
     );
+
+    public record ChangePasswordRequestDto(
+        string NewPassword
+    );
 }

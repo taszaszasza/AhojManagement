@@ -144,6 +144,23 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher passwordHasher
         return new Dtos.UserResponseDto(user.UserId, user.FirstName, user.LastName, user.Login, user.Role);
 
     }
+    
+    public Dtos.UserResponseDto ChangePassword( string targetUserId, Dtos.ChangePasswordRequestDto dto, string currentUserId, string currentRole)
+    {
+        if (string.IsNullOrWhiteSpace(dto.NewPassword))
+            throw new ValidationException("Password cannot be empty or whitespace.");
+        
+        if (currentRole != "Admin" && targetUserId != currentUserId)
+            throw new UnauthorizedAccessException("You can only change your own password.");
+
+        var user = db.Users.FirstOrDefault(u => u.UserId == targetUserId)
+                   ?? throw new KeyNotFoundException("No user with this id.");
+
+        user.PasswordHash = passwordHasher.HashAndSaltPassword(dto.NewPassword);
+        db.Update(user);
+
+        return new Dtos.UserResponseDto(user.UserId, user.FirstName, user.LastName, user.Login, user.Role);
+    }
 
     public void DeleteUser(string userId, string userRole, string currentId)
     {

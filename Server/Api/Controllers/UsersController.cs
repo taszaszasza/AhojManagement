@@ -60,5 +60,16 @@ public class UsersController(UserService service) : ControllerBase
         var currentUserRole = User.FindFirstValue(ClaimTypes.Role) ?? "User";
         return service.UpdateUser(userId, dto, currentUserRole);
     }
+    
+    [Authorize]
+    [HttpPut(nameof(ChangePassword))]
+    public Dtos.UserResponseDto ChangePassword(string userId, Dtos.ChangePasswordRequestDto dto)
+    {
+        var currentUserRole = User.FindFirstValue(ClaimTypes.Role) ?? "User";
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        return service.ChangePassword(userId, dto, currentUserId, currentUserRole);
+
+    }
 
 }

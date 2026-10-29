@@ -3,6 +3,7 @@ import { api } from "@/apiClient";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import {EditUserView} from "./EditUserView.tsx";
+import {ChangePasswordView} from "@/views/ChangePasswordView.tsx";
 
 interface UserManagementViewProps {
     currentUser: UserResponseDto;
@@ -15,6 +16,8 @@ export function UserManagementView(props: UserManagementViewProps) {
     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<UserResponseDto | null>(null);
+
+    const [passwordTargetUser, setPasswordTargetUser] = useState<UserResponseDto | null>(null);
     
     const getUsers = async () => {
         setLoading(true);
@@ -96,6 +99,35 @@ export function UserManagementView(props: UserManagementViewProps) {
         }
     };
 
+    const canChangePassword = (targetUser: UserResponseDto) => {
+        return props.currentUser.role === "Admin" || targetUser.userId === props.currentUser.userId;
+    };
+
+    const handleChangePasswordSubmit = async (newPassword: string) => {
+        if (!passwordTargetUser?.userId) return;
+
+        try {
+            // Generated client expects: (data: ChangePasswordRequestDto, query: { userId: string })
+            await api.users.usersChangePassword(
+                {
+                    newPassword: newPassword,
+                },
+                {
+                    userId: passwordTargetUser.userId,
+                }
+            );
+            toast.success(`Password updated for ${passwordTargetUser.login}.`);
+            setPasswordTargetUser(null);
+        } catch (error: any) {
+            const message =
+                error?.error?.detail ||
+                error?.error?.title ||
+                error?.message ||
+                "Failed to change password.";
+            toast.error(message);
+        }
+    };
+
     const canCreate = props.currentUser.role === "Admin" || props.currentUser.role === "Superuser";
 
     const canModifyRow = (targetUser: UserResponseDto) => {
@@ -113,6 +145,12 @@ export function UserManagementView(props: UserManagementViewProps) {
           <span>
             Signed in as: <strong>{props.currentUser.login}</strong> ({props.currentUser.role})
           </span>
+                    <button
+                        type="button"
+                        onClick={() => setPasswordTargetUser(props.currentUser)}
+                    >
+                        Change My Password
+                    </button>
                     <button type="button" onClick={props.onLogout}>
                         Sign Out
                     </button>
@@ -176,6 +214,17 @@ export function UserManagementView(props: UserManagementViewProps) {
                                                 >
                                                     Edit
                                                 </button>
+
+                                                {canChangePassword(u) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPasswordTargetUser(u)}
+                                                    >
+                                                        Password
+                                                    </button>
+                                                )}
+                                                
+                                                
                                                 {u.userId !== props.currentUser.userId && (
                                                     <button
                                                         type="button"
@@ -205,6 +254,14 @@ export function UserManagementView(props: UserManagementViewProps) {
                 }}
                 onSubmit={handleCreateEdit}
             />
+            )}
+
+            {passwordTargetUser && (
+                <ChangePasswordView
+                    targetUserLogin={passwordTargetUser.login!}
+                    onClose={() => setPasswordTargetUser(null)}
+                    onSubmit={handleChangePasswordSubmit}
+                />
             )}
             
         </div>
