@@ -3,7 +3,7 @@ import { api } from "@/apiClient";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import {EditUserView} from "./EditUserView.tsx";
-import {ChangePasswordView} from "@/views/ChangePasswordView.tsx";
+import {ChangePasswordView} from "./ChangePasswordView.tsx";
 
 interface UserManagementViewProps {
     currentUser: UserResponseDto;
